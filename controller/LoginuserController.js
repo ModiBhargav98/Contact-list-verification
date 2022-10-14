@@ -4,8 +4,6 @@ const UserDb = require("../model/user");
 const jwt = require("jsonwebtoken");
 
 exports.signupUser = catchAsyncError(async (req, res, next) => {
-  console.log(req.params.emailid);
-  console.log(req.query.contacts);
   const userDetail = await UserDb.findOne({ email: req.params.emailid });
   const contactList = req.query.contacts;
   let uniqueNumber = [];
@@ -34,16 +32,16 @@ exports.signupUser = catchAsyncError(async (req, res, next) => {
           email: req.params.emailid,
           contacts: number,
         });
-        console.log(createUser);
+        res.status(200).json({status:true,msg:createUser})
       } else {
         res
           .status(200)
-          .json({ success: true, msg: "Please add your contact number" });
+          .json({ success: false, msg: "Please add your contact number" });
       }
     } else {
       res
         .status(200)
-        .json({ success: true, msg: "Please add your contact number" });
+        .json({ success: false, msg: "Please add your contact number" });
     }
   } else {
     if (contactList?.length > 0) {
@@ -51,16 +49,18 @@ exports.signupUser = catchAsyncError(async (req, res, next) => {
       if(number?.length > 0){
         const mergeNumber = [...userDetail.contacts,...number]
         const uniqueNumber = [...new Set(mergeNumber)]
-        console.log(uniqueNumber)
+        userDetail.contacts  = uniqueNumber;
+        const result = await userDetail.save();
+        res.status(200).json({status:true,msg:result})
       }else{
         res
         .status(200)
-        .json({ success: true, msg: "Please add your contact number" });
+        .json({ success: false, msg: "Please add your contact number" });
       }
     }else{
       res
         .status(200)
-        .json({ success: true, msg: "Please add your contact number" });
+        .json({ success: false, msg: "Please add your contact number" });
     }
   }
 });
