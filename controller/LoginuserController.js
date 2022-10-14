@@ -47,6 +47,17 @@ exports.signupUser = catchAsyncError(async (req, res, next) => {
     }
   } else {
     if (contactList?.length > 0) {
+      const number = findDublicateNumber(contactList);
+      if(number?.length > 0){
+        const mergeNumber = [...userDetail.contacts,...number]
+        const uniqueNumber = [...new Set(mergeNumber)]
+        console.log(uniqueNumber)
+      }else{
+        res
+        .status(200)
+        .json({ success: true, msg: "Please add your contact number" });
+      }
+    }else{
       res
         .status(200)
         .json({ success: true, msg: "Please add your contact number" });
